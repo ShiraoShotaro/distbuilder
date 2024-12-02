@@ -1,0 +1,14 @@
+[directories]
+
+# 一時ディレクトリや T ドライブなど.
+# 環境変数文字 %HOGE% or ${HOGE} 使用可能.
+build = <path/to/working/root>
+
+# インストール先のルートディレクトリ
+# ここの下にライブラリ名でディレクトリが並びます.
+install = <path/to/install/root>
+
+[cmake]
+# "cmake" でパスが通っている cmake を使う
+# もしくは絶対 or 相対パス
+path = "cmake"
