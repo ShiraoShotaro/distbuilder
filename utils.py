@@ -9,7 +9,6 @@ class BuildError(RuntimeError):
         super().__init__(message)
 
 
-
 _globalConfig: dict = None
 
 
@@ -32,8 +31,14 @@ def loadLibraryConfig():
     import inspect
     try:
         with open(os.path.join(os.path.dirname(inspect.stack()[1].filename), "config.toml"),
-                mode="r", encoding="utf-8") as fp:
-            return toml.load(fp)
+                  mode="r", encoding="utf-8") as fp:
+            data = toml.load(fp)
+        # (version, variant, config) に展開する
+        ret = list()
+        for version, variants in data.items():
+            for variant, cfg in variants.items():
+                ret.append((version, variant, cfg))
+        return ret
     except Exception as e:
         raise BuildError(f"Failed to load library config. {e}")
 
@@ -61,17 +66,18 @@ def getOrDownloadSource(url: str, libraryName: str, version: str) -> str:
             urllib.request.urlretrieve(url, zipFilepath)
         except urllib.error.HTTPError as e:
             raise BuildError(f"Failed to download source. {e}")
-        
+
         print(f"-- Unzipping, destination = {unzipDirpath}")
         shutil.unpack_archive(zipFilepath, unzipDirpath)
-    
+
     else:
         print("-- Cached.")
     return unzipDirpath
 
 
 def getBuildDirectory(libraryName: str, version: str, variant: str, buildConfig: str):
-    print(f"getBuildDirectory(), {libraryName}@{version}/{variant}/{buildConfig}")
+    print(
+        f"getBuildDirectory(), {libraryName}@{version}/{variant}/{buildConfig}")
     buildDirectory = os.path.join(
         _globalConfig["directories"]["build"], libraryName, version,
         "build", variant, buildConfig)
@@ -90,7 +96,8 @@ def cmake(*args):
 
 
 def getInstallDirectory(libraryName: str, version: str, variant: str, buildConfig: str):
-    print(f"getInstallDirectory(), {libraryName}@{version}/{variant}/{buildConfig}")
+    print(
+        f"getInstallDirectory(), {libraryName}@{version}/{variant}/{buildConfig}")
     installDirectory = os.path.join(
         _globalConfig["directories"]["install"], libraryName, version, variant, buildConfig)
     if os.path.exists(installDirectory):
