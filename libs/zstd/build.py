@@ -7,8 +7,9 @@ def _build_1_5_6(srcPath: str, buildPath: str, installPath: str, buildConfig: st
     utils.cmake(f"-DCMAKE_RC_FLAGS=-I{srcPath}/lib",
                 "-S", os.path.join(srcPath, "build", "cmake"),
                 "-B", buildPath)
-    utils.cmake(f"--build", buildPath, "--config", buildConfig)
-    utils.cmake(f"--install", buildPath, "--prefix", installPath, "--config", buildConfig)
+    utils.cmake("--build", buildPath, "--config", buildConfig)
+    utils.cmake("--install", buildPath, "--prefix",
+                installPath, "--config", buildConfig)
 
 
 versions = {
@@ -22,11 +23,8 @@ versions = {
 
 def build():
     print("Build ZSTD")
-    cfg = utils.loadLibraryConfig()
-
-    for variant, cfg in cfg.items():
+    for version, variant, cfg in utils.loadLibraryConfig():
         try:
-            version = cfg["version"]
             versionConfig = versions[version]
             url = versionConfig["url"]
             if url is None:
@@ -39,12 +37,10 @@ def build():
                 print(f"Config: {buildConfig}")
                 buildDirectoryPath = utils.getBuildDirectory("zstd", version, variant, buildConfig)
                 installDirectoryPath = utils.getInstallDirectory("zstd", version, variant, buildConfig)
-                versionConfig["builder"](
-                    srcDirectory,
-                    buildDirectoryPath,
-                    installDirectoryPath,
-                    buildConfig)
+                versionConfig["builder"](srcDirectory,
+                                         buildDirectoryPath,
+                                         installDirectoryPath,
+                                         buildConfig)
 
         except KeyError as e:
             raise utils.BuildError(f"KeyError. {e}")
-

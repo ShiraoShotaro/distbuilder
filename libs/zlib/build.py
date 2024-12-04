@@ -4,29 +4,24 @@ import utils
 
 def _build(srcPath: str, buildPath: str, installPath: str, buildConfig: str):
     utils.cmake(
-        "-DCLI11_BUILD_DOCS=0",
-        "-DCLI11_BUILD_EXAMPLES=0",
-        "-DCLI11_BUILD_TESTS=0",
-        "-DCLI11_INSTALL=1",
-        "-DCLI11_PRECOMPILED=1",
-        "-DCLI11_SANITIZERS=0",
-        "-DCLI11_SINGLE_FILE=0",
+        f"-DCMAKE_INSTALL_PREFIX={installPath}",
+        "-DZLIB_BUILD_EXAMPLES=0",
         "-S", srcPath, "-B", buildPath)
     utils.cmake("--build", buildPath, "--config", buildConfig)
     utils.cmake("--install", buildPath, "--config", buildConfig, "--prefix", installPath)
 
 
 versions = {
-    "2.4.2": {
-        "url": "https://github.com/CLIUtils/CLI11/archive/refs/tags/v2.4.2.zip",
-        "root": "CLI11-2.4.2",
+    "1.3.1": {
+        "url": "https://github.com/madler/zlib/archive/refs/tags/v1.3.1.zip",
+        "root": "zlib-1.3.1",
         "builder": _build,
     },
 }
 
 
 def build():
-    print("Build CLI11")
+    print("Build zlib")
 
     for version, variant, cfg in utils.loadLibraryConfig():
         try:
@@ -36,12 +31,14 @@ def build():
                 raise utils.BuildError("Invalid version")
 
             srcDirectory = os.path.join(
-                utils.getOrDownloadSource(url, "CLI11", version), versionConfig["root"])
+                utils.getOrDownloadSource(url, "zlib", version), versionConfig["root"])
 
             for buildConfig in cfg["config"]:
                 print(f"Config: {buildConfig}")
-                buildDirectoryPath = utils.getBuildDirectory("CLI11", version, variant, buildConfig)
-                installDirectoryPath = utils.getInstallDirectory("CLI11", version, variant, buildConfig)
+                buildDirectoryPath = utils.getBuildDirectory(
+                    "zlib", version, variant, buildConfig)
+                installDirectoryPath = utils.getInstallDirectory(
+                    "zlib", version, variant, buildConfig)
                 versionConfig["builder"](srcDirectory,
                                          buildDirectoryPath,
                                          installDirectoryPath,
