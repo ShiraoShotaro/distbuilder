@@ -12,7 +12,7 @@ def _build(srcPath: str, buildPath: str, installPath: str, buildConfig: str):
 
 
 versions = {
-    "11.4.5": {
+    "1.3.1": {
         "url": "https://github.com/madler/zlib/archive/refs/tags/v1.3.1.zip",
         "root": "zlib-1.3.1",
         "builder": _build,
