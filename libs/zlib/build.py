@@ -4,6 +4,7 @@ import utils
 
 def _build(srcPath: str, buildPath: str, installPath: str, buildConfig: str):
     utils.cmake(
+        f"-DCMAKE_INSTALL_PREFIX={installPath}",
         "-DZLIB_BUILD_EXAMPLES=0",
         "-S", srcPath, "-B", buildPath)
     utils.cmake("--build", buildPath, "--config", buildConfig)
