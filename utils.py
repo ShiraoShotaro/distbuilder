@@ -76,8 +76,7 @@ def getOrDownloadSource(url: str, libraryName: str, version: str) -> str:
 
 
 def getBuildDirectory(libraryName: str, version: str, variant: str, buildConfig: str):
-    print(
-        f"getBuildDirectory(), {libraryName}@{version}/{variant}/{buildConfig}")
+    print(f"getBuildDirectory(), {libraryName}@{version}/{variant}/{buildConfig}")
     buildDirectory = os.path.join(
         _globalConfig["directories"]["build"], libraryName, version,
         "build", variant, buildConfig)
@@ -96,12 +95,21 @@ def cmake(*args):
 
 
 def getInstallDirectory(libraryName: str, version: str, variant: str, buildConfig: str):
-    print(
-        f"getInstallDirectory(), {libraryName}@{version}/{variant}/{buildConfig}")
-    installDirectory = os.path.join(
-        _globalConfig["directories"]["install"], libraryName, version, variant, buildConfig)
+    print(f"getInstallDirectory(), {libraryName}@{version}/{variant}/{buildConfig}")
+    installDirectory = os.path.join(_globalConfig["directories"]["install"],
+                                    libraryName, version, variant, buildConfig)
     if os.path.exists(installDirectory):
         shutil.rmtree(installDirectory)
     os.makedirs(installDirectory, exist_ok=True)
     print(f"-- install directory: {installDirectory}")
+    return installDirectory
+
+
+def searchLibrary(libraryName, version, variant, buildConfig: str):
+    print(f"searchPackage(), {libraryName}@{version}/{variant}/{buildConfig}")
+    installDirectory = os.path.join(_globalConfig["directories"]["install"],
+                                    libraryName, version, variant, buildConfig)
+    if not os.path.exists(installDirectory):
+        raise BuildError(f"Library '{libraryName}' is not found.")
+    print(f"Library '{libraryName}' is found. {installDirectory}")
     return installDirectory
