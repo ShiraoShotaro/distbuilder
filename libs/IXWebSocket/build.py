@@ -2,19 +2,23 @@ import os
 import utils
 
 
-def _build(srcPath: str, buildPath: str, installPath: str, buildConfig: str):
-    utils.cmake(
-        f"-DCLI11_BUILD_DOCS=0",
-        f"-DCLI11_BUILD_EXAMPLES=0",
-        f"-DCLI11_BUILD_TESTS=0",
-        f"-DCLI11_INSTALL=1",
-        f"-DCLI11_PRECOMPILED=1",
-        f"-DCLI11_SANITIZERS=0",
-        f"-DCLI11_SINGLE_FILE=0",
-        "-S", srcPath, "-B", buildPath)
-    utils.cmake(f"--build", buildPath, "--config", buildConfig)
-    utils.cmake(f"--install", buildPath, "--prefix",
-                installPath, "--config", buildConfig)
+def _build(config: dict, srcPath: str, buildPath: str, installPath: str, buildConfig: str):
+    zlibVersion, zlibVariant = config['deps']['zlib'].split("/", 1)
+    configArgs = list()
+
+    # ZLIB
+    configArgs.append(f"-DUSE_ZLIB={config['useZLIB']}")
+    if config["useZLIB"]:
+        configArgs.append(f"-DZLIB_ROOT={utils.searchLibrary('zlib', zlibVersion, zlibVariant, buildConfig)}")
+
+    # TLS
+    configArgs.append(f"-DUSE_TLS={config['useTLS']}")
+
+    configArgs.append("-DIXWEBSOCKET_INSTALL=1")
+
+    utils.cmake(*configArgs, "-S", srcPath, "-B", buildPath)
+    utils.cmake("--build", buildPath, "--config", buildConfig)
+    utils.cmake("--install", buildPath, "--config", buildConfig, "--prefix", installPath)
 
 
 versions = {
@@ -27,31 +31,27 @@ versions = {
 
 
 def build():
-    print("Build CLI11")
-    cfg = utils.loadLibraryConfig()
+    print("Build IXWebSocket")
 
-    for variant, cfg in cfg.items():
+    for version, variant, cfg in utils.loadLibraryConfig():
         try:
-            version = cfg["version"]
             versionConfig = versions[version]
             url = versionConfig["url"]
             if url is None:
                 raise utils.BuildError("Invalid version")
 
             srcDirectory = os.path.join(
-                utils.getOrDownloadSource(url, "CLI11", version), versionConfig["root"])
+                utils.getOrDownloadSource(url, "IXWebSocket", version), versionConfig["root"])
 
             for buildConfig in cfg["config"]:
                 print(f"Config: {buildConfig}")
-                buildDirectoryPath = utils.getBuildDirectory(
-                    "CLI11", version, variant, buildConfig)
-                installDirectoryPath = utils.getInstallDirectory(
-                    "CLI11", version, variant, buildConfig)
-                versionConfig["builder"](
-                    srcDirectory,
-                    buildDirectoryPath,
-                    installDirectoryPath,
-                    buildConfig)
+                buildDirectoryPath = utils.getBuildDirectory("IXWebSocket", version, variant, buildConfig)
+                installDirectoryPath = utils.getInstallDirectory("IXWebSocket", version, variant, buildConfig)
+                versionConfig["builder"](cfg,
+                                         srcDirectory,
+                                         buildDirectoryPath,
+                                         installDirectoryPath,
+                                         buildConfig)
 
         except KeyError as e:
             raise utils.BuildError(f"KeyError. {e}")
