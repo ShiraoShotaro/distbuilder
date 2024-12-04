@@ -105,7 +105,8 @@ def getInstallDirectory(libraryName: str, version: str, variant: str, buildConfi
     return installDirectory
 
 
-def searchLibrary(libraryName, version, variant, buildConfig: str):
+def searchLibrary(config: dict, libraryName: str, buildConfig: str):
+    version, variant = config.get("deps", dict())[libraryName].split("/", 1)
     print(f"searchPackage(), {libraryName}@{version}/{variant}/{buildConfig}")
     installDirectory = os.path.join(_globalConfig["directories"]["install"],
                                     libraryName, version, variant, buildConfig)
