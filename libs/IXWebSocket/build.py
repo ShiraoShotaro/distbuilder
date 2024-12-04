@@ -3,16 +3,16 @@ import utils
 
 
 def _build(config: dict, srcPath: str, buildPath: str, installPath: str, buildConfig: str):
-    zlibVersion, zlibVariant = config['deps']['zlib'].split("/", 1)
     configArgs = list()
 
     # ZLIB
     configArgs.append(f"-DUSE_ZLIB={config['useZLIB']}")
     if config["useZLIB"]:
-        configArgs.append(f"-DZLIB_ROOT={utils.searchLibrary('zlib', zlibVersion, zlibVariant, buildConfig)}")
+        path = utils.searchLibrary(config, "zlib", buildConfig)
+        configArgs.append(f"-DZLIB_ROOT={path}")
 
     # TLS
-    configArgs.append(f"-DUSE_TLS={config['useTLS']}")
+    # configArgs.append(f"-DUSE_TLS={config['useTLS']}")
 
     configArgs.append("-DIXWEBSOCKET_INSTALL=1")
 
