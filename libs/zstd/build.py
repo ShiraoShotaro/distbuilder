@@ -5,7 +5,6 @@ import utils
 def _build_1_5_6(srcPath: str, buildPath: str, installPath: str, buildConfig: str):
     # https://github.com/facebook/zstd/issues/3999
     utils.cmake(f"-DCMAKE_RC_FLAGS=-I{srcPath}/lib",
-                "-DCMAKE_CONFIGURATION_TYPE=Debug;Release",
                 "-S", os.path.join(srcPath, "build", "cmake"),
                 "-B", buildPath)
     utils.cmake("--build", buildPath, "--config", buildConfig)
