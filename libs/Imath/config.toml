@@ -1,0 +1,4 @@
+
+["3.1.12"._]
+config = ["Release", "Debug"]
+shared = false

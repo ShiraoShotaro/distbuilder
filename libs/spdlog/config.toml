@@ -1,0 +1,7 @@
+
+["1.15.0"._]
+config = ["Release", "Debug"]
+shared = false
+# fmtExternal = true
+useStdFormat = true
+disableDefaultLogger = false

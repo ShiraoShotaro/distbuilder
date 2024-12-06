@@ -2,6 +2,8 @@ import os
 import subprocess
 import toml
 import shutil
+import glob
+import stat
 
 
 class BuildError(RuntimeError):
@@ -50,6 +52,17 @@ def cleanCache():
     print("-- OK.")
 
 
+def recreateDirectory(rootPath: str):
+    if os.path.exists(rootPath):
+        for root, _, files in os.walk(rootPath):
+            for filename in files:
+                fullpath = os.path.join(root, filename)
+                if not os.access(fullpath, os.W_OK):
+                    os.chmod(fullpath, stat.S_IWRITE)
+        shutil.rmtree(rootPath)
+    os.makedirs(rootPath)
+
+
 def getOrDownloadSource(url: str, libraryName: str, version: str) -> str:
     import urllib.error
     import urllib.request
@@ -79,9 +92,10 @@ def getBuildDirectory(libraryName: str, version: str, variant: str, buildConfig:
     print(f"getBuildDirectory(), {libraryName}@{version}/{variant}/{buildConfig}")
     buildDirectory = os.path.join(
         _globalConfig["directories"]["build"], libraryName, version,
-        "build", variant, buildConfig)
-    if os.path.exists(buildDirectory):
-        shutil.rmtree(buildDirectory)
+        "build", variant)
+    if buildConfig:
+        buildDirectory = os.path.join(buildDirectory, buildConfig)
+    recreateDirectory(buildDirectory)
     os.makedirs(buildDirectory, exist_ok=True)
     print(f"-- build directory: {buildDirectory}")
     return buildDirectory
@@ -97,10 +111,10 @@ def cmake(*args):
 def getInstallDirectory(libraryName: str, version: str, variant: str, buildConfig: str):
     print(f"getInstallDirectory(), {libraryName}@{version}/{variant}/{buildConfig}")
     installDirectory = os.path.join(_globalConfig["directories"]["install"],
-                                    libraryName, version, variant, buildConfig)
-    if os.path.exists(installDirectory):
-        shutil.rmtree(installDirectory)
-    os.makedirs(installDirectory, exist_ok=True)
+                                    libraryName, version, variant)
+    if buildConfig:
+        installDirectory = os.path.join(installDirectory, buildConfig)
+    recreateDirectory(installDirectory)
     print(f"-- install directory: {installDirectory}")
     return installDirectory
 
@@ -109,8 +123,17 @@ def searchLibrary(config: dict, libraryName: str, buildConfig: str):
     version, variant = config.get("deps", dict())[libraryName].split("/", 1)
     print(f"searchPackage(), {libraryName}@{version}/{variant}/{buildConfig}")
     installDirectory = os.path.join(_globalConfig["directories"]["install"],
-                                    libraryName, version, variant, buildConfig)
+                                    libraryName, version, variant)
+    if buildConfig:
+        installDirectory = os.path.join(installDirectory, buildConfig)
     if not os.path.exists(installDirectory):
         raise BuildError(f"Library '{libraryName}' is not found.")
-    print(f"Library '{libraryName}' is found. {installDirectory}")
-    return installDirectory
+    # cmake を探す
+    candidates = glob.glob(os.path.join(installDirectory, "**/*.cmake"), recursive=True)
+    candidates = [(fp, os.path.basename(fp).lower()) for fp in candidates]
+    for fp, fn in candidates:
+        print(f"-- search: {fp}")
+        if fn.endswith("config.cmake") and fn.startswith(libraryName.lower()):
+            print(f"Library '{libraryName}' is found. {os.path.dirname(fp)}")
+            return os.path.dirname(fp)
+    raise BuildError(f"Library '{libraryName}' cmake file is not found.")
