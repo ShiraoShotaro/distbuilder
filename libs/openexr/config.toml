@@ -1,0 +1,7 @@
+
+["3.3.2"._]
+config = ["Release", "Debug"]
+shared = false
+
+deps.Imath = "3.1.12/_"
+deps.libdeflate = "1.18/zl"
