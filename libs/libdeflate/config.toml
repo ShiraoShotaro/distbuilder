@@ -1,0 +1,26 @@
+
+["1.22"._]
+config = ["Release", "Debug"]
+shared = false
+
+buildGzip = false
+gzipSupport = false
+zlibSupport = false
+
+
+["1.22".zl]
+config = ["Release", "Debug"]
+shared = false
+
+buildGzip = false
+gzipSupport = false
+zlibSupport = true
+
+
+["1.18".zl]
+config = ["Release", "Debug"]
+shared = false
+
+buildGzip = false
+gzipSupport = false
+zlibSupport = true
