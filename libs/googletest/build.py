@@ -4,7 +4,8 @@ import utils
 
 def _build(config, srcPath: str, buildPath: str, installPath: str, buildConfig: str):
     args = [
-        "-DINSTALL_GTEST=1"
+        "-DINSTALL_GTEST=1",
+        "-Dgtest_force_shared_crt=1",
         f"-DBUILD_SHARED_LIBS={config['shared']}",
         f"-DBUILD_GMOCK={config['gmock']}"
     ]
