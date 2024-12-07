@@ -1,4 +1,3 @@
 
 ["3.11.3"._]
 config = ["Release", "Debug"]
-shared = false
