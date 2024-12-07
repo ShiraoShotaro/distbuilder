@@ -137,3 +137,17 @@ def searchLibrary(config: dict, libraryName: str, buildConfig: str):
             print(f"Library '{libraryName}' is found. {os.path.dirname(fp)}")
             return os.path.dirname(fp)
     raise BuildError(f"Library '{libraryName}' cmake file is not found.")
+
+
+def insertCMakeExportCommands(libraryName: str, cmakeFilepath: str, *targetNames: str):
+    lines = f"""
+    install(TARGETS {' '.join(targetNames)} EXPORT {libraryName}-export)
+    install(EXPORT {libraryName}-export FILE {libraryName}-config.cmake
+        DESTINATION lib/cmake/{libraryName} NAMESPACE {libraryName}::)
+    """
+
+    with open(cmakeFilepath, mode="r", encoding="utf-8") as fp:
+        content = fp.read()
+    content += lines
+    with open(cmakeFilepath, mode="w", encoding="utf-8") as fp:
+        fp.write(content)
