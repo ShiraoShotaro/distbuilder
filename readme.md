@@ -26,7 +26,7 @@ python.exe -m pip install -r pip-requirements.txt
 ビルドバリアントを設定すれば, あとは以下のコマンドでビルドが行われます.
 
 ```
-python build.py <ライブラリ名>
+python main.py <ライブラリ名>
 ```
 
 `--clean` オプションで, ダウンロード済みソースを削除できます.
@@ -36,7 +36,7 @@ python build.py <ライブラリ名>
 config.toml の `directories.install` の階層以下に,
 
 ```
-/<libraryName>/<version>/<variantName>/<config>/...
+/<libraryName>/<version>/<variantName>/[<config>/]...
 ```
 
 としてビルド成果物が配置されます.
