@@ -8,7 +8,15 @@ build = <path/to/working/root>
 # ここの下にライブラリ名でディレクトリが並びます.
 install = <path/to/install/root>
 
+# ライブラリの追加検索パス
+# ./libs はデフォルトで追加されています
+# そのほか, 独自のライブラリリストを追加できます.
+# その場合, 相対はこの config.toml から, もしくは絶対パスで指定できます.
+# 環境変数も使用可能.
+sources = []
+
 [cmake]
 # "cmake" でパスが通っている cmake を使う
 # もしくは絶対 or 相対パス
 path = "cmake"
+
