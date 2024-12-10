@@ -1,8 +1,25 @@
+import os
+
 
 def _launch(libraryName: str):
     import importlib
-    buildModule = importlib.import_module(f"libs.{libraryName}.build")
-    buildModule.build()
+    import importlib.util
+    dirs = utils.getSourceDirectories()
+    for dirpath in dirs:
+        filepath = os.path.join(dirpath, libraryName, "build.py")
+        print(filepath)
+        if os.path.exists(filepath):
+            print(f"Found library script. {filepath}")
+            break
+    else:
+        raise utils.BuildError(f"Not found {libraryName}")
+
+    spec = importlib.util.spec_from_file_location(libraryName, filepath)
+    builder = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(builder)
+
+    os.chdir(os.path.dirname(filepath))
+    builder.build()
 
 
 def main(*libraryNames: str):
@@ -31,4 +48,3 @@ if __name__ == "__main__":
         utils.cleanCache()
 
     main(*args.libraryName)
-

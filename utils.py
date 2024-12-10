@@ -24,9 +24,30 @@ def loadGlobalConfig(path=None):
     with open(tomlPath, mode="r", encoding="utf-8") as fp:
         _globalConfig = toml.load(fp)
 
+    # expand/abs path
+    def _makeAbs(path):
+        path = os.path.expandvars(path)
+        if not os.path.isabs(path):
+            path = os.path.abspath(os.path.join(os.path.dirname(tomlPath), path))
+        return path
+
+    _globalConfig["directories"]["build"] = _makeAbs(_globalConfig["directories"]["build"])
+    _globalConfig["directories"]["install"] = _makeAbs(_globalConfig["directories"]["install"])
+
+    _globalConfig["directories"]["sources"] \
+        = _globalConfig["directories"]\
+        .get("sources", list())\
+        + [(os.path.join(os.path.dirname(__file__), "libs"))]
+
+    _globalConfig["directories"]["sources"] = [_makeAbs(p) for p in _globalConfig["directories"]["sources"]]
+
 
 def getGlobalConfig() -> dict:
     return _globalConfig.copy()
+
+
+def getSourceDirectories() -> list:
+    return _globalConfig["directories"]["sources"].copy()
 
 
 def loadLibraryConfig():
@@ -81,10 +102,27 @@ def getOrDownloadSource(url: str, libraryName: str, version: str) -> str:
             raise BuildError(f"Failed to download source. {e}")
 
         print(f"-- Unzipping, destination = {unzipDirpath}")
+        recreateDirectory(unzipDirpath)
         shutil.unpack_archive(zipFilepath, unzipDirpath)
 
     else:
         print("-- Cached.")
+    return unzipDirpath
+
+
+def extractSource(zipFilepath: str, libraryName: str, version: str) -> str:
+    print(f"extractSource(), {libraryName}@{version}, {zipFilepath}")
+    libraryBuildDirectory = os.path.join(
+        _globalConfig["directories"]["build"], libraryName, version)
+    os.makedirs(libraryBuildDirectory, exist_ok=True)
+
+    unzipDirpath = os.path.join(libraryBuildDirectory, "src")
+    if not os.path.exists(zipFilepath):
+        raise BuildError(f"Source zip file is not existing. {zipFilepath}")
+
+    print(f"-- Unzipping, destination = {unzipDirpath}")
+    recreateDirectory(unzipDirpath)
+    shutil.unpack_archive(zipFilepath, unzipDirpath)
     return unzipDirpath
 
 
