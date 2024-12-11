@@ -1,0 +1,5 @@
+
+["2024.07.02"._]
+config = ["Release", "Debug"]
+shared = false
+deps.abseil = "20240722.0/_"

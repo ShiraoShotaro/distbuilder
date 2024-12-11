@@ -10,6 +10,7 @@ def _build(config: dict, srcPath: str, buildPath: str, installPath: str, buildCo
     if config["useZLIB"]:
         path = utils.searchLibrary(config, "zlib", buildConfig)
         configArgs.append(f"-DZLIB_ROOT={path}")
+        configArgs.append("-DZLIB_USE_STATIC_LIBS=1")
 
     # TLS
     # configArgs.append(f"-DUSE_TLS={config['useTLS']}")
