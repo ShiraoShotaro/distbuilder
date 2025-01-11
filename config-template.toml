@@ -2,11 +2,11 @@
 
 # 一時ディレクトリや T ドライブなど.
 # 環境変数文字 %HOGE% or ${HOGE} 使用可能.
-build = <path/to/working/root>
+build = "<path/to/working/root>"
 
 # インストール先のルートディレクトリ
 # ここの下にライブラリ名でディレクトリが並びます.
-install = <path/to/install/root>
+install = "<path/to/install/root>"
 
 # ライブラリの追加検索パス
 # ./libs はデフォルトで追加されています
