@@ -2,13 +2,13 @@ import os
 import utils
 
 
-def _build(config: dict, srcPath: str, buildPath: str, installPath: str, buildConfig: str):
+def _build(config: utils.Config, srcPath: str, buildPath: str, installPath: str, buildConfig: str):
     configArgs = list()
 
     # ZLIB
-    configArgs.append(f"-DUSE_ZLIB={config['useZLIB']}")
-    if config["useZLIB"]:
-        path = utils.searchLibrary(config, "zlib", buildConfig)
+    configArgs.append(f"-DUSE_ZLIB={config.useZLIB.f(False).t(bool)}")
+    if config.useZLIB.f(False).t(bool):
+        path = config.dep("zlib").req(cmakeReq=False)
         configArgs.append(f"-DZLIB_ROOT={path}")
         configArgs.append("-DZLIB_USE_STATIC_LIBS=1")
 
@@ -17,9 +17,8 @@ def _build(config: dict, srcPath: str, buildPath: str, installPath: str, buildCo
 
     configArgs.append("-DIXWEBSOCKET_INSTALL=1")
 
-    utils.cmake(*configArgs, "-S", srcPath, "-B", buildPath)
-    utils.cmake("--build", buildPath, "--config", buildConfig)
-    utils.cmake("--install", buildPath, "--config", buildConfig, "--prefix", installPath)
+    utils.cmakeConfigure(srcPath, buildPath, *configArgs)
+    utils.cmakeBuildAndInstall(buildPath, buildConfig, installPath)
 
 
 versions = {
@@ -48,7 +47,7 @@ def build():
                 print(f"Config: {buildConfig}")
                 buildDirectoryPath = utils.getBuildDirectory("IXWebSocket", version, variant, buildConfig)
                 installDirectoryPath = utils.getInstallDirectory("IXWebSocket", version, variant, buildConfig)
-                versionConfig["builder"](cfg,
+                versionConfig["builder"](utils.Config(cfg, buildConfig),
                                          srcDirectory,
                                          buildDirectoryPath,
                                          installDirectoryPath,

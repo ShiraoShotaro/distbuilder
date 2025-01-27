@@ -3,12 +3,11 @@ import utils
 
 
 def _build(srcPath: str, buildPath: str, installPath: str, buildConfig: str):
-    utils.cmake(
+    utils.cmakeConfigure(
+        srcPath, buildPath,
         f"-DCMAKE_INSTALL_PREFIX={installPath}",
-        "-DZLIB_BUILD_EXAMPLES=0",
-        "-S", srcPath, "-B", buildPath)
-    utils.cmake("--build", buildPath, "--config", buildConfig)
-    utils.cmake("--install", buildPath, "--config", buildConfig, "--prefix", installPath)
+        "-DZLIB_BUILD_EXAMPLES=0")
+    utils.cmakeBuildAndInstall(buildPath, buildConfig, installPath)
 
 
 versions = {

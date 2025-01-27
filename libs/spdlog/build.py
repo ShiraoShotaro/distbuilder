@@ -22,9 +22,8 @@ def _build(config, srcPath: str, buildPath: str, installPath: str, buildConfig: 
     else:
         args.append(f"-DSPDLOG_FMT_EXTERNAL={config['fmtExternal']}")
 
-    utils.cmake(*args, "-S", srcPath, "-B", buildPath)
-    utils.cmake("--build", buildPath, "--config", buildConfig)
-    utils.cmake("--install", buildPath, "--config", buildConfig, "--prefix", installPath)
+    utils.cmakeConfigure(srcPath, buildPath, *args)
+    utils.cmakeBuildAndInstall(buildPath, buildConfig, installPath)
 
 
 versions = {

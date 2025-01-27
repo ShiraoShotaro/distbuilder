@@ -2,7 +2,8 @@ from distbuilder.config import Config
 from distbuilder.errors import BuildError
 from distbuilder.functions import (
     cleanCache,
-    cmake,
+    cmakeConfigure,
+    cmakeBuildAndInstall,
     extractSource,
     getBuildDirectory,
     getBuildRootDirectory,

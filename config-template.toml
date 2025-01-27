@@ -20,3 +20,8 @@ sources = []
 # もしくは絶対 or 相対パス
 path = "cmake"
 
+# cmake で使う generator
+# 未指定で, デフォルトで設定された generator を使う
+# 詳しくは cmake --help で確認できる.
+generator = "Visual Studio 17 2022"
+arch = "x64"

@@ -3,17 +3,16 @@ import utils
 
 
 def _build(srcPath: str, buildPath: str, installPath: str, buildConfig: str):
-    utils.cmake(
+    utils.cmakeConfigure(
+        srcPath, buildPath,
         "-DCLI11_BUILD_DOCS=0",
         "-DCLI11_BUILD_EXAMPLES=0",
         "-DCLI11_BUILD_TESTS=0",
         "-DCLI11_INSTALL=1",
         "-DCLI11_PRECOMPILED=1",
         "-DCLI11_SANITIZERS=0",
-        "-DCLI11_SINGLE_FILE=0",
-        "-S", srcPath, "-B", buildPath)
-    utils.cmake("--build", buildPath, "--config", buildConfig)
-    utils.cmake("--install", buildPath, "--config", buildConfig, "--prefix", installPath)
+        "-DCLI11_SINGLE_FILE=0")
+    utils.cmakeBuildAndInstall(buildPath, buildConfig, installPath)
 
 
 versions = {

@@ -156,11 +156,40 @@ def getBuildDirectory(libraryName: str, version: str, variant: str, buildConfig:
     return buildDirectory
 
 
-def cmake(*args):
-    args = [_globalConfig["cmake"]["path"]] + [str(arg) for arg in args]
+def _cmake(*args):
+    args = [_globalConfig["cmake"]["path"]] + list(args)
     print("> {}".format(" ".join(args)))
     if subprocess.run(args).returncode != 0:
         raise BuildError("Failed to cmake.")
+
+
+def cmakeConfigure(src: str, build: str, *args):
+    """ Configure cmake.
+
+    Args:
+        src (str): Path to source.
+        build (str): Path to build.
+    """
+    generator = _globalConfig["cmake"].get("generator")
+    arch = _globalConfig["cmake"]["arch"]
+    pargs = ["-A", arch]
+    if generator is not None:
+        pargs += ["-G", generator]
+    pargs += list(args)
+    pargs += ["-S", src, "-B", build]
+    _cmake(*pargs)
+
+
+def cmakeBuildAndInstall(build: str, config: str, install: str):
+    """ Build by cmake.
+
+    Args:
+        build (str): Path to build.
+        config (str): Release or Debug.
+        install (str): Install path.
+    """
+    _cmake("--build", build, "--config", config)
+    _cmake("--install", build, "--config", config, "--prefix", install)
 
 
 def getInstallDirectory(libraryName: str, version: str, variant: str, buildConfig: str):
