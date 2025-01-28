@@ -14,9 +14,8 @@ def _build(config: utils.Config, srcPath: str, buildPath: str, installPath: str,
         "-DCMAKE_C_FLAGS=/utf-8",
     ]
 
-    utils.cmake(*args, "-S", srcPath, "-B", buildPath)
-    utils.cmake("--build", buildPath, "--config", buildConfig)
-    utils.cmake("--install", buildPath, "--config", buildConfig, "--prefix", installPath)
+    utils.cmakeConfigure(srcPath, buildPath, *args)
+    utils.cmakeBuildAndInstall(buildPath, buildConfig, installPath)
 
 
 versions = {
