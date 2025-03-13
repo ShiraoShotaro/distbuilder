@@ -1,0 +1,11 @@
+
+["0.5.2"._]
+config = ["Release", "Debug"]
+shared = false
+withAVX = true
+withAVX2 = true
+withAVX512 = true
+withOpenMP = false
+withSSE41 = true
+withSSE42 = true
+withSSSE3 = true
